@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
-import { listarCategorias, listarProductos, type ColumnaOrden, type Pagina } from '@/api'
+import {
+  listarCategorias,
+  listarProductos,
+  urlExportacion,
+  type ColumnaOrden,
+  type Pagina,
+} from '@/api'
 
 const props = defineProps<{ refrescar: number }>()
 
@@ -24,6 +30,15 @@ const resultado = ref<Pagina | null>(null)
 const cargando = ref(false)
 const error = ref('')
 
+// Filtros de la última carga exitosa: la descarga exporta exactamente lo que muestra la tabla.
+const aplicados = ref({
+  q: '',
+  categoria: '',
+  orden: 'id' as ColumnaOrden,
+  dir: 'asc' as 'asc' | 'desc',
+})
+const urlDescarga = computed(() => urlExportacion(aplicados.value))
+
 const dinero = new Intl.NumberFormat('es', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 const entero = new Intl.NumberFormat('es')
 
@@ -36,18 +51,13 @@ async function cargar() {
   controlador = actual
   cargando.value = true
   error.value = ''
+  const filtros = { q: q.value, categoria: categoria.value, orden: orden.value, dir: dir.value }
   try {
     resultado.value = await listarProductos(
-      {
-        q: q.value,
-        categoria: categoria.value,
-        page: page.value,
-        limit: limit.value,
-        orden: orden.value,
-        dir: dir.value,
-      },
+      { ...filtros, page: page.value, limit: limit.value },
       actual.signal,
     )
+    aplicados.value = filtros
   } catch (e) {
     if (actual.signal.aborted) return
     error.value = e instanceof Error ? e.message : 'No se pudo cargar la lista'
@@ -133,7 +143,24 @@ onUnmounted(() => {
 
 <template>
   <section class="tarjeta" aria-labelledby="titulo-productos">
-    <h2 id="titulo-productos">Productos</h2>
+    <div class="encabezado">
+      <h2 id="titulo-productos">Productos</h2>
+      <a
+        v-if="resultado && resultado.total > 0"
+        class="boton"
+        :href="urlDescarga"
+        download
+        :title="
+          hayFiltros ? 'Descarga solo los productos filtrados' : 'Descarga todos los productos'
+        "
+      >
+        Descargar Excel
+        <span class="solo-lectores"
+          >({{ hayFiltros ? 'solo los filtrados' : 'todos los productos' }})</span
+        >
+      </a>
+      <button v-else type="button" disabled>Descargar Excel</button>
+    </div>
 
     <form class="filtros" role="search" @submit.prevent>
       <label class="campo campo--ancho">
@@ -232,6 +259,14 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
 .filtros {
   display: flex;
   flex-wrap: wrap;

@@ -95,6 +95,23 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* Un enlace con aspecto de botón (para descargas: es un <a>, no un <button>). */
+a.boton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.4rem 1rem;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  color: var(--texto);
+  text-decoration: none;
+}
+
+a.boton:hover {
+  border-color: var(--acento);
+}
+
 button.primario {
   background: var(--acento);
   border-color: var(--acento);

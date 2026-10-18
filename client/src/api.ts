@@ -60,16 +60,24 @@ async function pedir<T>(url: string, init?: RequestInit): Promise<T> {
   return (await res.json()) as T
 }
 
-export function listarProductos(filtros: FiltrosProductos, signal?: AbortSignal): Promise<Pagina> {
-  const params = new URLSearchParams({
-    page: String(filtros.page),
-    limit: String(filtros.limit),
-    orden: filtros.orden,
-    dir: filtros.dir,
-  })
+// Filtros y orden: los mismos para el listado y para la descarga, así el Excel coincide con la tabla.
+function paramsDeFiltros(filtros: Omit<FiltrosProductos, 'page' | 'limit'>): URLSearchParams {
+  const params = new URLSearchParams({ orden: filtros.orden, dir: filtros.dir })
   if (filtros.q.trim()) params.set('q', filtros.q.trim())
   if (filtros.categoria) params.set('categoria', filtros.categoria)
+  return params
+}
+
+export function listarProductos(filtros: FiltrosProductos, signal?: AbortSignal): Promise<Pagina> {
+  const params = paramsDeFiltros(filtros)
+  params.set('page', String(filtros.page))
+  params.set('limit', String(filtros.limit))
   return pedir<Pagina>(`/api/productos?${params}`, { signal })
+}
+
+// La descarga es un enlace normal: el navegador la maneja (barra de progreso, carpeta de descargas).
+export function urlExportacion(filtros: Omit<FiltrosProductos, 'page' | 'limit'>): string {
+  return `/api/productos/exportar?${paramsDeFiltros(filtros)}`
 }
 
 export function listarCategorias(): Promise<string[]> {

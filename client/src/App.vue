@@ -1,47 +1,43 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { ref } from 'vue'
+import ImportarExcel from '@/components/ImportarExcel.vue'
+import ProductosTabla from '@/components/ProductosTabla.vue'
+
+// Cada importación exitosa incrementa el contador; la tabla lo observa y se recarga.
+const refrescar = ref(0)
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
+  <header class="cabecera">
+    <h1>Gestor de datos</h1>
+    <p>Importa productos desde Excel, búscalos y revisa tu inventario.</p>
   </header>
 
-  <main>
-    <TheWelcome />
+  <main class="contenido">
+    <ImportarExcel @importado="refrescar++" />
+    <ProductosTabla :refrescar="refrescar" />
   </main>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
+.cabecera {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 2rem 1rem 1rem;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+.cabecera p {
+  margin: 0.25rem 0 0;
+  color: var(--texto-suave);
 }
 
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.contenido {
+  display: grid;
+  /* minmax(0, 1fr) deja que las tarjetas se encojan; sin él, la tabla ancha estira la página. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.25rem;
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0 1rem 3rem;
 }
 </style>

@@ -24,4 +24,13 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_productos_categoria ON productos (categoria);
   CREATE INDEX IF NOT EXISTS idx_productos_nombre ON productos (nombre);
+  CREATE TABLE IF NOT EXISTS archivos (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre_original TEXT    NOT NULL,
+    nombre_guardado TEXT    NOT NULL UNIQUE,
+    tamano          INTEGER NOT NULL,
+    filas_ok        INTEGER NOT NULL DEFAULT 0,
+    filas_error     INTEGER NOT NULL DEFAULT 0,
+    creado_en       TEXT    NOT NULL DEFAULT (datetime('now'))
+  );
 `)

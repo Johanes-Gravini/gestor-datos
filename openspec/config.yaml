@@ -1,0 +1,47 @@
+schema: spec-driven
+
+context: |
+  Language: es
+  All artifacts must be written in es.
+  Keep OpenSpec structural headings and SHALL/MUST keywords in English.
+
+  Proyecto: "Gestor de datos", app full stack de práctica para una prueba técnica.
+  Permite importar productos desde Excel/CSV, buscarlos, paginarlos y exportarlos.
+
+  Stack:
+  - client/: Vue 3 + Vite + TypeScript, CSS puro (sin librerías de UI). Llamadas a la API solo en client/src/api.ts.
+  - server/: Node.js (>=22.18 o >=24.12) + Express 5 + TypeScript. Base de datos SQLite con node:sqlite (sin módulos nativos).
+  - Producción: un solo proceso Express sirve la API y client/dist. Sin Docker.
+  - Entorno por variables: PORT, DATABASE_PATH, UPLOADS_DIR.
+
+  Convenciones:
+  - Rutas de la API bajo /api; los errores se devuelven como JSON { error: string } con el código HTTP correcto.
+  - Todo parámetro de usuario se valida; en SQL solo consultas parametrizadas y listas blancas para ORDER BY.
+  - Los archivos subidos se guardan con nombre aleatorio y se valida su contenido real, no solo la extensión.
+  - Los filtros del listado y de las exportaciones comparten una sola función (construirConsulta en server/src/routes/productos.ts).
+  - Cada cambio debe poder verificarse: pasar "npm run build" en client y server, y probarse con datos reales.
+
+  Flujo de ramas: prod (lo que ve el cliente) y qa (pruebas). Las features salen de prod, se mezclan en qa
+  para probarlas y luego pasan a prod por Pull Request.
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing

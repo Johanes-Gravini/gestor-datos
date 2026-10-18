@@ -1,6 +1,7 @@
 import express from 'express'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import productosRouter from './routes/productos.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const clientDist = path.resolve(__dirname, '../../client/dist')
@@ -16,6 +17,8 @@ app.get('/api/health', (_req, res) => {
     uptime: Math.round(process.uptime()),
   })
 })
+
+app.use('/api/productos', productosRouter)
 
 // En producción Express también sirve el frontend compilado (client/dist).
 app.use(express.static(clientDist))
